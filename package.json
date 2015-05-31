@@ -1,0 +1,28 @@
+{
+  "name": "learnyoureact",
+  "version": "1.0.0",
+  "description": "learnyoureact nodeshool workshop",
+  "main": "program.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sericaia/learnyoureact.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sericaia/learnyoureact/issues"
+  },
+  "homepage": "https://github.com/sericaia/learnyoureact#readme",
+  "dependencies": {
+    "body-parser": "^1.12.4",
+    "browserify": "^10.2.3",
+    "express": "^4.12.4",
+    "express-react-views": "^0.8.1",
+    "node-jsx": "^0.13.3",
+    "react": "^0.13.3",
+    "reactify": "^1.1.1"
+  }
+}
