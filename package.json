@@ -21,6 +21,8 @@
     "browserify": "^10.2.3",
     "express": "^4.12.4",
     "express-react-views": "^0.8.1",
+    "hapi": "^8.6.0",
+    "hapijs-react-views": "^0.7.3",
     "node-jsx": "^0.13.3",
     "react": "^0.13.3",
     "reactify": "^1.1.1"

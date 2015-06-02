@@ -1,4 +1,4 @@
-var express = require('express');
+var Hapi = require('hapi');
 var React = require('react'); 
 var DOM = React.DOM; 
 var body = DOM.body; 
@@ -7,16 +7,28 @@ var script = DOM.script;
 
 var browserify = require('browserify');
 
+var fs = require('fs');
+
 require('node-jsx').install(); 
 
 var TodoBox = require('./views/index.jsx');
 
-var app = express();
+// Create a server with a host and port
+var server = new Hapi.Server();
+server.connection({ 
+  host: 'localhost', 
+  port: (process.argv[2] || 3000) 
+});
 
-app.set('port', (process.argv[2] || 3000));
-app.set('view engine', 'jsx');
-app.set('views', __dirname + '/views'); 
-app.engine('jsx', require('express-react-views').createEngine());
+var engine = require('hapijs-react-views')();
+
+server.views({
+  defaultExtension: 'jsx',
+  engines: {
+        jsx: engine, // support for .jsx files 
+        js: engine // support for .js 
+      }
+    });
 
 require('node-jsx').install();
 
@@ -25,34 +37,54 @@ var data = [];
 data.push({title: "Shopping", detail: process.argv[3]});
 data.push({title: "Hair cut", detail: process.argv[4]});
 
-// app.use('/', function(req, res) {
-//     res.render('index',  {data: data});
-// });
-app.use('/bundle.js', function(req, res) { 
-  res.setHeader('content-type', 'application/javascript'); 
-  browserify('./app.js') 
-  .transform('reactify') 
-  .bundle() 
-  .pipe(res); 
+server.route({
+  method: 'GET',
+  path:'/bundle.js', 
+  handler: function (request, reply) {
+
+    var bundleData = browserify('./app.js') 
+    .transform('reactify') 
+    .bundle();    
+
+    if (bundleData) {
+      var name = 'bundle.js';
+      var path = __dirname + "/" + name;
+      var file = fs.createWriteStream(path);
+
+      file.on('error', function (err) { 
+        console.error(err) 
+      });
+
+      bundleData.pipe(file);
+
+      bundleData.on('end', function (err) { 
+        //TOCHANGE: use stream instead of file
+        reply.file(path);
+      })
+    }
+  }
 });
 
-app.use('/', function(req, res) { 
-  var initialData = JSON.stringify(data); 
-  var markup = React.renderToString(React.createElement(TodoBox, {data: data}));
-  
-  res.setHeader('Content-Type', 'text/html'); 
-  
-  var html = React.renderToStaticMarkup(body(null, 
+server.route({
+  method: 'GET',
+  path:'/', 
+  handler: function (request, reply) {
+
+    var initialData = JSON.stringify(data); 
+    var markup = React.renderToString(React.createElement(TodoBox, {data: data}));
+
+    var html = React.renderToStaticMarkup(body(null, 
       div({id: 'app', dangerouslySetInnerHTML: {__html: markup}}), 
       script({id: 'initial-data', 
-          type: 'text/plain', 
-          'data-json': initialData 
+        type: 'text/plain', 
+        'data-json': initialData 
       }), 
       script({src: '/bundle.js'}) 
       )); 
-  
-  res.end(html); 
+
+    reply(html).header('Content-Type', 'text/html'); 
+  }
 });
 
-
-app.listen(app.get('port'), function() {});
+// Start the server
+server.start();
