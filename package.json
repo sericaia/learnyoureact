@@ -25,6 +25,7 @@
     "hapijs-react-views": "^0.7.3",
     "node-jsx": "^0.13.3",
     "react": "^0.13.3",
-    "reactify": "^1.1.1"
+    "reactify": "^1.1.1",
+    "through2-map": "^1.4.0"
   }
 }
