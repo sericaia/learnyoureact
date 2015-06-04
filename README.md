@@ -1,2 +1,2 @@
 # learnyoureact
-learnyoureact nodeshool workshop
+learnyoureact nodeshool workshop using hapi insead of express
